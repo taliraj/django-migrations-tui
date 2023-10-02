@@ -4,9 +4,14 @@ django-migrations-tui
 
 Manage Django Migrations with a Text-Based UI
 
+Installation
+------------
+``django-migrations-tui`` is available on PyPI and can be installed with ``pip``:
+
+    pip install django-migrations-tui
+
 Quick start
 -----------
 
-1. Run ``pip install django-migrations-tui``.
-2. Add ``django_migrations_tui`` to your ``INSTALLED_APPS``.
-3. Run ``python manage.py migrationstui`` to start the UI.
+1. Add ``django_migrations_tui`` to your ``INSTALLED_APPS``.
+2. Run ``python manage.py migrationstui`` to start the UI.
