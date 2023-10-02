@@ -10,7 +10,7 @@ Installation
 
 .. code-block:: console
 
-    $ pip install django-migrations-tui
+    pip install django-migrations-tui
 
 Quick start
 -----------
