@@ -8,7 +8,9 @@ Installation
 ------------
 ``django-migrations-tui`` is available on PyPI and can be installed with ``pip``:
 
-    pip install django-migrations-tui
+.. code-block:: console
+
+    $ pip install django-migrations-tui
 
 Quick start
 -----------
