@@ -24,7 +24,6 @@ def command():
     db = cmd_options["database"]
     connection = connections[db]
 
-    # if options["format"] == "plan":
     return command, connection, cmd_options
 
 
@@ -40,6 +39,14 @@ def migrations_plan(command):
     command, connection, cmd_options = command
     migrations = command.show_plan(connection, cmd_options["app_label"])
     return migrations
+
+@pytest.fixture
+def migrations_plan_verbosity_2(command):
+    command, connection, cmd_options = command
+    command.verbosity = 2
+    migrations = command.show_plan(connection, cmd_options["app_label"])
+    return migrations
+
 
 @pytest.fixture
 def recorded_migrations():
