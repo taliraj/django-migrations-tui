@@ -11,6 +11,7 @@ from textual.widgets import Footer, Header, Tree
 
 # TODO: Add a way to search for a migration and filter
 # TODO: Add a way to select a migration and run it
+# TODO: Add a way to switch between views (list, plan)
 
 
 @dataclass
