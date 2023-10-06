@@ -17,3 +17,12 @@ Quick start
 
 1. Add ``django_migrations_tui`` to your ``INSTALLED_APPS``.
 2. Run ``python manage.py migrationstui`` to start the UI.
+
+Screenshot
+----------
+
+.. image:: docs/screenshot.png
+    :alt: Screenshot of django-migrations-tui
+    :align: center
+    :width: 600px
+    :target: docs/screenshot.png
