@@ -1,0 +1,23 @@
+name: Run Tests
+
+on: [pull_request]
+
+jobs:
+  test:
+    name: Test and Build package 📦
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: "3.x"
+    - name: Install pypa/build
+      run: |
+        python3 -m pip install -e '.[test]'
+        python3 -m pip install build --user
+    - name: Run tests
+      run: pytest
+    - name: Build a binary wheel and a source tarball
+      run: python3 -m build
