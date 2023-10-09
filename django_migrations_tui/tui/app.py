@@ -13,9 +13,11 @@ class MigrationsApp(App):
     TITLE = "Django Migrations TUI"
 
     BINDINGS = [
-        ("f", "toggle_format", "Format"),
+        ("v", "toggle_format", "View"),
         ("l", "toggle_logs", "Logs"),
         ("m", "migrate", "Migrate"),
+        ("f", "fake_migration", "Fake"),
+        ("r", "revert_migrations", "Revert App"),
     ]
 
     def __init__(self, *args, format: Format, **kwargs):
@@ -49,3 +51,13 @@ class MigrationsApp(App):
         """An action to toggle the format of the migrations tree."""
         tree = self.query_one(MigrationsTree)
         await tree.toggle_format()
+
+    def action_fake_migration(self) -> None:
+        """An action to fake a migration."""
+        tree = self.query_one(MigrationsTree)
+        tree.fake_migration()
+
+    def action_revert_migrations(self) -> None:
+        """An action to revert a migration."""
+        tree = self.query_one(MigrationsTree)
+        tree.revert_migrations()

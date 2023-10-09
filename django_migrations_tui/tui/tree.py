@@ -146,3 +146,50 @@ class MigrationsTree(Tree):
             else:
                 await self.update_migrations_plan()
 
+    def fake_migration(self) -> None:
+        if self.format == Format.LIST:
+            self.fake_migration_list()
+        else:
+            self.fake_migration_plan()
+
+    def fake_migration_list(self) -> None:
+        selected_item = self.cursor_node
+        if selected_item.is_root:
+            command = ["python", "manage.py", "migrate", "--fake"]
+        elif selected_item.allow_expand:
+            app_name = str(selected_item.label).split(" (")[0]
+            command = ["python", "manage.py", "migrate", "--fake", app_name]
+        elif not selected_item.allow_expand and str(selected_item.label) == " (no migrations)":
+            self.post_message(self.Status("No migrations to fake."))
+            return
+        else:
+            app_name = str(selected_item.parent.label).split(" (")[0]
+            migration_name = str(selected_item.label).split("] ")[1]
+            command = ["python", "manage.py", "migrate", "--fake", app_name, migration_name]
+
+        self.run_command(command)
+
+    def fake_migration_plan(self) -> None:
+        selected_item = self.cursor_node
+        if selected_item.is_root:
+            command = ["python", "manage.py", "migrate", "--fake"]
+        else:
+            # discard the [X] from the label
+            migration = str(selected_item.label)[5:]
+            command = ["python", "manage.py", "migrate", "--fake", *migration.split(".")]
+
+        self.run_command(command)
+
+    def revert_migrations(self) -> None:
+        """Revert all migrations for an app."""
+        if self.format == Format.LIST:
+            selected_item = self.cursor_node
+            if selected_item.allow_expand and not selected_item.is_root:
+                app_name = str(selected_item.label).split(" (")[0]
+                command = ["python", "manage.py", "migrate", app_name, "zero"]
+                self.run_command(command)
+            else:
+                self.post_message(self.Status("Select an app to revert."))
+        else:
+            self.post_message(self.Status("Revertions are not supported in plan format."))
+
