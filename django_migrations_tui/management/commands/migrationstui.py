@@ -1,9 +1,11 @@
-from django.core.management.commands.showmigrations import Command as ShowMigrationsCommand
+from django.core.management.commands.showmigrations import (
+    Command as ShowMigrationsCommand,
+)
 from django.db import connections
 from django.db.migrations.loader import MigrationLoader
 from django.db.migrations.recorder import MigrationRecorder
 
-from django_migrations_tui.tui.app import MigrationsApp, Format
+from django_migrations_tui.tui.app import Format, MigrationsApp
 from django_migrations_tui.tui.utils import MigrationsList
 
 
@@ -134,11 +136,14 @@ class Command(ShowMigrationsCommand):
             if self.verbosity >= 2:
                 deps = print_deps(node)
             if node.key in loader.applied_migrations:
-                migrations_plan.append("[X]  %s.%s%s" % (node.key[0], node.key[1], deps))
+                migrations_plan.append(
+                    "[X]  %s.%s%s" % (node.key[0], node.key[1], deps)
+                )
             else:
-                migrations_plan.append("[ ]  %s.%s%s" % (node.key[0], node.key[1], deps))
+                migrations_plan.append(
+                    "[ ]  %s.%s%s" % (node.key[0], node.key[1], deps)
+                )
         if not plan:
             migrations_plan.append("(no migrations)")
 
         return migrations_plan
-

@@ -2,8 +2,8 @@ import enum
 import sys
 from dataclasses import dataclass
 
-from django.db import connections
 from django.core.management import ManagementUtility, handle_default_options
+from django.db import connections
 
 
 class Format(enum.StrEnum):
@@ -24,8 +24,8 @@ class MigrationsList:
 
 
 def migrations_command():
-    utility = ManagementUtility(['migrationstui'])
-    command = utility.fetch_command('migrationstui')
+    utility = ManagementUtility(["migrationstui"])
+    command = utility.fetch_command("migrationstui")
 
     # argv = ['manage.py', 'migrationstui']
     argv = sys.argv
@@ -56,4 +56,3 @@ def get_migrations_plan():
     connection = connections[db]
     plan = command.show_plan(connection, cmd_options["app_label"])
     return plan
-

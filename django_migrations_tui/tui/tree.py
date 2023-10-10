@@ -1,12 +1,12 @@
 import asyncio
+
 from asgiref.sync import sync_to_async
-
 from textual import work
-from textual.worker import Worker, WorkerState
-from textual.widgets import Tree
 from textual.message import Message
+from textual.widgets import Tree
+from textual.worker import Worker, WorkerState
 
-from .utils import get_migrations_list, get_migrations_plan, Format
+from .utils import Format, get_migrations_list, get_migrations_plan
 
 # TODO: Add a way to search for a migration and filter
 
@@ -44,7 +44,11 @@ class MigrationsTree(Tree):
     async def update_migrations_list(self) -> None:
         migrations = await self.get_migrations_list()
         total_migrations = sum(
-            [len(app.migrations) for app in migrations if app.migrations != [" (no migrations)"]]
+            [
+                len(app.migrations)
+                for app in migrations
+                if app.migrations != [" (no migrations)"]
+            ]
         )
         total_applied = sum([app.applied_count for app in migrations])
 
@@ -58,7 +62,11 @@ class MigrationsTree(Tree):
     async def reload_migrations_list(self) -> None:
         migrations = await self.get_migrations_list()
         total_migrations = sum(
-            [len(app.migrations) for app in migrations if app.migrations != [" (no migrations)"]]
+            [
+                len(app.migrations)
+                for app in migrations
+                if app.migrations != [" (no migrations)"]
+            ]
         )
         total_applied = sum([app.applied_count for app in migrations])
         self.root.set_label("migrations (%s/%s)" % (total_applied, total_migrations))
@@ -71,7 +79,9 @@ class MigrationsTree(Tree):
     async def update_migrations_plan(self) -> None:
         migrations = await self.get_migrations_plan()
         total_migrations = len(migrations)
-        total_applied = sum([1 for migration in migrations if migration.startswith("[X]")])
+        total_applied = sum(
+            [1 for migration in migrations if migration.startswith("[X]")]
+        )
 
         self.reset("plan (%s/%s)" % (total_applied, total_migrations))
         self.root.expand()
@@ -99,7 +109,10 @@ class MigrationsTree(Tree):
         elif selected_item.allow_expand:
             app_name = str(selected_item.label).split(" (")[0]
             command = ["python", "manage.py", "migrate", app_name]
-        elif not selected_item.allow_expand and str(selected_item.label) == " (no migrations)":
+        elif (
+            not selected_item.allow_expand
+            and str(selected_item.label) == " (no migrations)"
+        ):
             self.post_message(self.Status("No migrations to apply."))
             return
         else:
@@ -140,7 +153,11 @@ class MigrationsTree(Tree):
 
     async def on_worker_state_changed(self, event: Worker.StateChanged) -> None:
         """Called when the worker state changes."""
-        if event.state in [WorkerState.CANCELLED, WorkerState.ERROR, WorkerState.SUCCESS]:
+        if event.state in [
+            WorkerState.CANCELLED,
+            WorkerState.ERROR,
+            WorkerState.SUCCESS,
+        ]:
             if self.format == Format.LIST:
                 await self.reload_migrations_list()
             else:
@@ -159,13 +176,23 @@ class MigrationsTree(Tree):
         elif selected_item.allow_expand:
             app_name = str(selected_item.label).split(" (")[0]
             command = ["python", "manage.py", "migrate", "--fake", app_name]
-        elif not selected_item.allow_expand and str(selected_item.label) == " (no migrations)":
+        elif (
+            not selected_item.allow_expand
+            and str(selected_item.label) == " (no migrations)"
+        ):
             self.post_message(self.Status("No migrations to fake."))
             return
         else:
             app_name = str(selected_item.parent.label).split(" (")[0]
             migration_name = str(selected_item.label).split("] ")[1]
-            command = ["python", "manage.py", "migrate", "--fake", app_name, migration_name]
+            command = [
+                "python",
+                "manage.py",
+                "migrate",
+                "--fake",
+                app_name,
+                migration_name,
+            ]
 
         self.run_command(command)
 
@@ -176,7 +203,13 @@ class MigrationsTree(Tree):
         else:
             # discard the [X] from the label
             migration = str(selected_item.label)[5:]
-            command = ["python", "manage.py", "migrate", "--fake", *migration.split(".")]
+            command = [
+                "python",
+                "manage.py",
+                "migrate",
+                "--fake",
+                *migration.split("."),
+            ]
 
         self.run_command(command)
 
@@ -191,5 +224,6 @@ class MigrationsTree(Tree):
             else:
                 self.post_message(self.Status("Select an app to revert."))
         else:
-            self.post_message(self.Status("Revertions are not supported in plan format."))
-
+            self.post_message(
+                self.Status("Revertions are not supported in plan format.")
+            )

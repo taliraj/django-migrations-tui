@@ -1,16 +1,15 @@
 import pytest
-
-from django.db import connections
 from django.core.management import ManagementUtility, handle_default_options
+from django.db import connections
 from django.db.migrations.recorder import MigrationRecorder
 
 
 @pytest.fixture
 def command():
-    utility = ManagementUtility(['migrationstui'])
-    command = utility.fetch_command('migrationstui')
+    utility = ManagementUtility(["migrationstui"])
+    command = utility.fetch_command("migrationstui")
 
-    argv = ['manage.py', 'migrationstui']
+    argv = ["manage.py", "migrationstui"]
     command._called_from_command_line = True
     parser = command.create_parser(argv[0], argv[1])
 
@@ -40,6 +39,7 @@ def migrations_plan(command):
     migrations = command.show_plan(connection, cmd_options["app_label"])
     return migrations
 
+
 @pytest.fixture
 def migrations_plan_verbosity_2(command):
     command, connection, cmd_options = command
@@ -50,6 +50,6 @@ def migrations_plan_verbosity_2(command):
 
 @pytest.fixture
 def recorded_migrations():
-    recorder = MigrationRecorder(connections['default'])
+    recorder = MigrationRecorder(connections["default"])
     applied_migrations = recorder.applied_migrations().keys()
     return applied_migrations
