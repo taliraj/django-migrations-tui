@@ -1,7 +1,6 @@
 from django.core.management.commands.showmigrations import (
     Command as ShowMigrationsCommand,
 )
-from django.db import connections
 from django.db.migrations.loader import MigrationLoader
 from django.db.migrations.recorder import MigrationRecorder
 
@@ -16,10 +15,6 @@ class Command(ShowMigrationsCommand):
         self.verbosity = options["verbosity"]
         self.options = options
 
-        # Get the database we're operating from
-        # self.db = options["database"]
-        # self.connection = connections[self.db]
-
         if options["format"] == "plan":
             format = Format.PLAN
         else:
@@ -27,16 +22,6 @@ class Command(ShowMigrationsCommand):
 
         app = MigrationsApp(format=format)
         app.run()
-
-    def get_migrations_list(self):
-        db = self.options["database"]
-        connection = connections[db]
-        return self.show_list(connection, self.options["app_label"])
-
-    def get_migrations_plan(self):
-        db = self.options["database"]
-        connection = connections[db]
-        return self.show_plan(connection, self.options["app_label"])
 
     def show_list(self, connection, app_names=None):
         """

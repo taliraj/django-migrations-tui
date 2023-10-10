@@ -23,12 +23,15 @@ class MigrationsList:
         return f"{self.app_name} ({self.applied_count}/{len(self.migrations)})"
 
 
-def migrations_command():
+def get_migrations(format: Format = Format.LIST, argv: list[str] | None = None):
     utility = ManagementUtility(["migrationstui"])
     command = utility.fetch_command("migrationstui")
 
-    # argv = ['manage.py', 'migrationstui']
-    argv = sys.argv
+    if argv is None:
+        argv = sys.argv
+    if len(argv) < 2:
+        argv = ["manage.py", "migrationstui"]
+
     command._called_from_command_line = True
     parser = command.create_parser(argv[0], argv[1])
 
@@ -38,21 +41,19 @@ def migrations_command():
     handle_default_options(options)
     command.verbosity = cmd_options["verbosity"]
 
-    # Get the database we're operating from
-    return command, cmd_options
-
-
-def get_migrations_list():
-    command, cmd_options = migrations_command()
     db = cmd_options["database"]
     connection = connections[db]
-    migrations = command.show_list(connection, cmd_options["app_label"])
+
+    if format == Format.LIST:
+        migrations = command.show_list(connection, cmd_options["app_label"])
+    else:
+        migrations = command.show_plan(connection, cmd_options["app_label"])
     return migrations
 
 
-def get_migrations_plan():
-    command, cmd_options = migrations_command()
-    db = cmd_options["database"]
-    connection = connections[db]
-    plan = command.show_plan(connection, cmd_options["app_label"])
-    return plan
+def get_migrations_list(argv: list[str] | None = None):
+    return get_migrations(format=Format.LIST, argv=argv)
+
+
+def get_migrations_plan(argv: list[str] | None = None):
+    return get_migrations(format=Format.PLAN, argv=argv)
