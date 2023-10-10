@@ -1,29 +1,10 @@
-from dataclasses import dataclass
-
 from django.core.management.commands.showmigrations import Command as ShowMigrationsCommand
 from django.db import connections
 from django.db.migrations.loader import MigrationLoader
 from django.db.migrations.recorder import MigrationRecorder
 
-from textual.app import App, ComposeResult
-from textual.widgets import Footer, Header, Tree
-
-
-# TODO: Add a way to search for a migration and filter
-# TODO: Add a way to select a migration and run it
-# TODO: Add a way to switch between views (list, plan)
-
-
-@dataclass
-class MigrationsList:
-    app_name: str
-    applied_count: int
-    migrations: list[str]
-
-    def __str__(self):
-        if self.migrations == [" (no migrations)"]:
-            return f"{self.app_name} (0/0)"
-        return f"{self.app_name} ({self.applied_count}/{len(self.migrations)})"
+from django_migrations_tui.tui.app import MigrationsApp, Format
+from django_migrations_tui.tui.utils import MigrationsList
 
 
 class Command(ShowMigrationsCommand):
@@ -31,19 +12,29 @@ class Command(ShowMigrationsCommand):
 
     def handle(self, *args, **options):
         self.verbosity = options["verbosity"]
+        self.options = options
 
         # Get the database we're operating from
-        db = options["database"]
-        connection = connections[db]
+        # self.db = options["database"]
+        # self.connection = connections[self.db]
 
         if options["format"] == "plan":
-            migrations = self.show_plan(connection, options["app_label"])
-            app = MigrationsTUI(migrations_plan=migrations)
+            format = Format.PLAN
         else:
-            migrations = self.show_list(connection, options["app_label"])
-            app = MigrationsTUI(migrations_list=migrations)
+            format = Format.LIST
 
+        app = MigrationsApp(format=format)
         app.run()
+
+    def get_migrations_list(self):
+        db = self.options["database"]
+        connection = connections[db]
+        return self.show_list(connection, self.options["app_label"])
+
+    def get_migrations_plan(self):
+        db = self.options["database"]
+        connection = connections[db]
+        return self.show_plan(connection, self.options["app_label"])
 
     def show_list(self, connection, app_names=None):
         """
@@ -150,51 +141,4 @@ class Command(ShowMigrationsCommand):
             migrations_plan.append("(no migrations)")
 
         return migrations_plan
-
-
-class MigrationsTUI(App):
-    """A Textual app to manage django migrations."""
-
-    BINDINGS = [("d", "toggle_dark", "Toggle dark mode")]
-
-    def __init__(self, *args, migrations_list=None, migrations_plan=None, **kwargs):
-        super().__init__(*args, **kwargs)
-
-        self.migrations_list = migrations_list or []
-        self.migrations_plan = migrations_plan or []
-
-    def compose(self) -> ComposeResult:
-        """Create child widgets for the app."""
-        yield Header()
-        if self.migrations_plan:
-            yield self.get_migrations_plan()
-        else:
-            yield self.get_migrations_list()
-        yield Footer()
-
-    def get_migrations_list(self) -> Tree[dict]:
-        total_migrations = sum(
-            [len(app.migrations) for app in self.migrations_list if app.migrations != [" (no migrations)"]]
-        )
-        total_applied = sum([app.applied_count for app in self.migrations_list])
-        tree: Tree[dict] = Tree("migrations (%s/%s)" % (total_applied, total_migrations))
-        tree.root.expand()
-        for app in self.migrations_list:
-            current_app = tree.root.add(str(app))
-            for migration_name in app.migrations:
-                current_app.add_leaf(migration_name)
-        return tree
-
-    def get_migrations_plan(self) -> Tree[dict]:
-        total_migrations = len(self.migrations_plan)
-        total_applied = sum([1 for migration in self.migrations_plan if migration.startswith("[X]")])
-        tree: Tree[dict] = Tree("plan (%s/%s)" % (total_applied, total_migrations))
-        tree.root.expand()
-        for item in self.migrations_plan:
-            tree.root.add_leaf(item)
-        return tree
-
-    def action_toggle_dark(self) -> None:
-        """An action to toggle dark mode."""
-        self.dark = not self.dark
 
