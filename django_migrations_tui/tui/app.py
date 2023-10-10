@@ -1,10 +1,10 @@
-from textual.containers import Vertical
 from textual.app import App, ComposeResult
+from textual.containers import Vertical
 from textual.widgets import Footer, Header
 
-from .utils import Format
-from .tree import MigrationsTree
 from .logs import Log
+from .tree import MigrationsTree
+from .utils import Format
 
 
 class MigrationsApp(App):
