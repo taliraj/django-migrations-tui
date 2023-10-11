@@ -15,8 +15,15 @@ Installation
 Quick start
 -----------
 
-1. Add ``django_migrations_tui`` to your ``INSTALLED_APPS``.
-2. Run ``python manage.py migrationstui`` to start the UI.
+#. Add ``django_migrations_tui`` to your ``INSTALLED_APPS``.
+#. Run ``python manage.py migrationstui`` to start the UI.
+#. Use the arrow keys to navigate and press the letter keys to perform actions.
+
+   * ``v``: Change the format of the migration list: ``list`` or ``plan``
+   * ``l``: Toggle the logs panel
+   * ``m``: Run ``migrate`` on the selected migration or app
+   * ``f``: Run ``migrate --fake`` on the selected migration or app
+   * ``r``: Run ``migrate <app name> zero`` on the selected app
 
 Screenshots
 ----------
