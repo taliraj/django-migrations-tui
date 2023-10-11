@@ -96,13 +96,13 @@ class MigrationsTree(Tree):
     def get_migrations_plan(self):
         return get_migrations_plan()
 
-    def action_migrate(self) -> None:
+    def action_migrate(self):
         if self.format == Format.LIST:
-            self.migrate_list()
+            return self.migrate_list()
         else:
-            self.migrate_plan()
+            return self.migrate_plan()
 
-    def migrate_list(self) -> None:
+    def migrate_list(self):
         selected_item = self.cursor_node
         if selected_item.is_root:
             command = ["python", "manage.py", "migrate"]
@@ -113,16 +113,16 @@ class MigrationsTree(Tree):
             not selected_item.allow_expand
             and str(selected_item.label) == " (no migrations)"
         ):
-            self.post_message(self.Status("No migrations to apply."))
-            return
+            self.post_error_message("No migrations to apply.")
+            return None
         else:
             app_name = str(selected_item.parent.label).split(" (")[0]
             migration_name = str(selected_item.label).split("] ")[1]
             command = ["python", "manage.py", "migrate", app_name, migration_name]
 
-        self.run_command(command)
+        return command
 
-    def migrate_plan(self) -> None:
+    def migrate_plan(self) -> list[str]:
         selected_item = self.cursor_node
         if selected_item.is_root:
             command = ["python", "manage.py", "migrate"]
@@ -131,11 +131,11 @@ class MigrationsTree(Tree):
             migration = str(selected_item.label)[5:]
             command = ["python", "manage.py", "migrate", *migration.split(".")]
 
-        self.run_command(command)
+        return command
 
     @work(exclusive=True)
     async def run_command(self, command: list[str]):
-        self.post_message(self.Status(f"\n[bold cyan]{' '.join(command)}"))
+        self.post_success_message(f"Running {' '.join(command)}")
 
         proc = await asyncio.create_subprocess_exec(
             *command,
@@ -163,13 +163,13 @@ class MigrationsTree(Tree):
             else:
                 await self.update_migrations_plan()
 
-    def fake_migration(self) -> None:
+    def fake_migration(self):
         if self.format == Format.LIST:
-            self.fake_migration_list()
+            return self.fake_migration_list()
         else:
-            self.fake_migration_plan()
+            return self.fake_migration_plan()
 
-    def fake_migration_list(self) -> None:
+    def fake_migration_list(self):
         selected_item = self.cursor_node
         if selected_item.is_root:
             command = ["python", "manage.py", "migrate", "--fake"]
@@ -180,8 +180,8 @@ class MigrationsTree(Tree):
             not selected_item.allow_expand
             and str(selected_item.label) == " (no migrations)"
         ):
-            self.post_message(self.Status("No migrations to fake."))
-            return
+            self.post_error_message("No migrations to fake.")
+            return None
         else:
             app_name = str(selected_item.parent.label).split(" (")[0]
             migration_name = str(selected_item.label).split("] ")[1]
@@ -193,10 +193,9 @@ class MigrationsTree(Tree):
                 app_name,
                 migration_name,
             ]
+        return command
 
-        self.run_command(command)
-
-    def fake_migration_plan(self) -> None:
+    def fake_migration_plan(self) -> list[str]:
         selected_item = self.cursor_node
         if selected_item.is_root:
             command = ["python", "manage.py", "migrate", "--fake"]
@@ -211,19 +210,29 @@ class MigrationsTree(Tree):
                 *migration.split("."),
             ]
 
-        self.run_command(command)
+        return command
 
-    def revert_migrations(self) -> None:
+    def revert_migrations(self):
         """Revert all migrations for an app."""
         if self.format == Format.LIST:
             selected_item = self.cursor_node
             if selected_item.allow_expand and not selected_item.is_root:
                 app_name = str(selected_item.label).split(" (")[0]
                 command = ["python", "manage.py", "migrate", app_name, "zero"]
-                self.run_command(command)
+                return command
             else:
-                self.post_message(self.Status("Select an app to revert."))
+                self.post_warning_message("Select an app to revert.")
         else:
-            self.post_message(
-                self.Status("Revertions are not supported in plan format.")
-            )
+            self.post_error_message("Revert not supported in plan format.")
+
+    def post_warning_message(self, message: str) -> None:
+        """Post a warning message to the log."""
+        self.post_message(self.Status(f"[bold #ffa62b]{message}"))
+
+    def post_error_message(self, message: str) -> None:
+        """Post an error message to the log."""
+        self.post_message(self.Status(f"[bold #ff0000]{message}"))
+
+    def post_success_message(self, message: str) -> None:
+        """Post a success message to the log."""
+        self.post_message(self.Status(f"[bold cyan]{message}"))

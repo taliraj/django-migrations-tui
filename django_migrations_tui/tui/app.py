@@ -2,6 +2,7 @@ from textual.app import App, ComposeResult
 from textual.containers import Vertical
 from textual.widgets import Footer, Header
 
+from .confirmation import ConfirmationScreen
 from .logs import Log
 from .tree import MigrationsTree
 from .utils import Format
@@ -10,6 +11,7 @@ from .utils import Format
 class MigrationsApp(App):
     """A Textual app to manage django migrations."""
 
+    CSS_PATH = "app.tcss"
     TITLE = "Django Migrations TUI"
 
     BINDINGS = [
@@ -17,7 +19,7 @@ class MigrationsApp(App):
         ("l", "toggle_logs", "Logs"),
         ("m", "migrate", "Migrate"),
         ("f", "fake_migration", "Fake"),
-        ("r", "revert_migrations", "Revert App"),
+        ("r", "revert_migrations", "Revert"),
     ]
 
     def __init__(self, *args, format: Format, **kwargs):
@@ -25,16 +27,11 @@ class MigrationsApp(App):
         super().__init__(*args, **kwargs)
 
     def compose(self) -> ComposeResult:
-        """Create child widgets for the app."""
         with Vertical():
             yield Header()
             yield MigrationsTree(self.format)
             yield Log(markup=True, highlight=True, wrap=True)
             yield Footer()
-
-    def action_migrate(self) -> None:
-        tree = self.query_one(MigrationsTree)
-        tree.action_migrate()
 
     def on_migrations_tree_status(self, message: MigrationsTree.Status) -> None:
         """Called when the status of a migration changes."""
@@ -52,12 +49,37 @@ class MigrationsApp(App):
         tree = self.query_one(MigrationsTree)
         await tree.toggle_format()
 
+    def action_migrate(self) -> None:
+        tree = self.query_one(MigrationsTree)
+        command = tree.action_migrate()
+
+        def check_confirmation(apply) -> None:
+            if apply:
+                tree.run_command(command)
+
+        if command:
+            self.push_screen(ConfirmationScreen(command), check_confirmation)
+
     def action_fake_migration(self) -> None:
         """An action to fake a migration."""
         tree = self.query_one(MigrationsTree)
-        tree.fake_migration()
+        command = tree.fake_migration()
+
+        def check_confirmation(apply) -> None:
+            if apply:
+                tree.run_command(command)
+
+        if command:
+            self.push_screen(ConfirmationScreen(command), check_confirmation)
 
     def action_revert_migrations(self) -> None:
         """An action to revert a migration."""
         tree = self.query_one(MigrationsTree)
-        tree.revert_migrations()
+        command = tree.revert_migrations()
+
+        def check_confirmation(apply) -> None:
+            if apply:
+                tree.run_command(command)
+
+        if command:
+            self.push_screen(ConfirmationScreen(command), check_confirmation)
