@@ -1,2 +1,3 @@
 include LICENSE
 include README.rst
+include django_migrations_tui/tui/static/*
