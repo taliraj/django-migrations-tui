@@ -11,7 +11,7 @@ from .utils import Format
 class MigrationsApp(App):
     """A Textual app to manage django migrations."""
 
-    CSS_PATH = "app.tcss"
+    CSS_PATH = "static/app.tcss"
     TITLE = "Django Migrations TUI"
 
     BINDINGS = [
