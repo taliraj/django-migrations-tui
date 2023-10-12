@@ -122,7 +122,7 @@ class MigrationsTree(Tree):
 
         return command
 
-    def migrate_plan(self) -> list[str]:
+    def migrate_plan(self):
         selected_item = self.cursor_node
         if selected_item.is_root:
             command = ["python", "manage.py", "migrate"]
@@ -134,7 +134,7 @@ class MigrationsTree(Tree):
         return command
 
     @work(exclusive=True)
-    async def run_command(self, command: list[str]):
+    async def run_command(self, command):
         self.post_success_message(f"Running {' '.join(command)}")
 
         proc = await asyncio.create_subprocess_exec(
@@ -195,7 +195,7 @@ class MigrationsTree(Tree):
             ]
         return command
 
-    def fake_migration_plan(self) -> list[str]:
+    def fake_migration_plan(self):
         selected_item = self.cursor_node
         if selected_item.is_root:
             command = ["python", "manage.py", "migrate", "--fake"]

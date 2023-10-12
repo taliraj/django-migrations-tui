@@ -1,6 +1,7 @@
 import enum
 import sys
 from dataclasses import dataclass
+from typing import List
 
 from django.core.management import ManagementUtility, handle_default_options
 from django.db import connections
@@ -15,7 +16,7 @@ class Format(enum.Enum):
 class MigrationsList:
     app_name: str
     applied_count: int
-    migrations: list[str]
+    migrations: List[str]
 
     def __str__(self):
         if self.migrations == [" (no migrations)"]:
@@ -23,7 +24,7 @@ class MigrationsList:
         return f"{self.app_name} ({self.applied_count}/{len(self.migrations)})"
 
 
-def get_migrations(format: Format = Format.LIST, argv: list[str] | None = None):
+def get_migrations(format: Format = Format.LIST, argv=None):
     utility = ManagementUtility(["migrationstui"])
     command = utility.fetch_command("migrationstui")
 
@@ -51,9 +52,9 @@ def get_migrations(format: Format = Format.LIST, argv: list[str] | None = None):
     return migrations
 
 
-def get_migrations_list(argv: list[str] | None = None):
+def get_migrations_list(argv=None):
     return get_migrations(format=Format.LIST, argv=argv)
 
 
-def get_migrations_plan(argv: list[str] | None = None):
+def get_migrations_plan(argv=None):
     return get_migrations(format=Format.PLAN, argv=argv)
