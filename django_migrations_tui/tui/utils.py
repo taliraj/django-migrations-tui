@@ -6,7 +6,7 @@ from django.core.management import ManagementUtility, handle_default_options
 from django.db import connections
 
 
-class Format(enum.StrEnum):
+class Format(enum.Enum):
     LIST = "list"
     PLAN = "plan"
 
