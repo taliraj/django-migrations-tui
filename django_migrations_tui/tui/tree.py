@@ -18,13 +18,11 @@ class MigrationsTree(Tree):
     BINDINGS = [
         Binding("j", "cursor_down", "Down", show=False),
         Binding("k", "cursor_up", "Up", show=False),
-        Binding(
-            "ctrl+home", "scroll_home", "Home", show=False
-        ),  # TODO: make this work with gg keys
-        Binding(
-            "ctrl+g", "scroll_home", "Home", show=False
-        ),  # TODO: make this work with gg keys
+        Binding("ctrl+home", "scroll_home", "Home", show=False),
         Binding("G", "scroll_end", "End", show=False),
+        Binding("ctrl+end", "scroll_end", "End", show=False),
+        Binding("ctrl+b", "page_up", "Page up", show=False),
+        Binding("ctrl+f", "page_down", "Page down", show=False),
     ]
 
     class Status(Message):
