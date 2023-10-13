@@ -2,6 +2,7 @@ import asyncio
 
 from asgiref.sync import sync_to_async
 from textual import work
+from textual.binding import Binding
 from textual.message import Message
 from textual.widgets import Tree
 from textual.worker import Worker, WorkerState
@@ -13,6 +14,18 @@ from .utils import Format, get_migrations_list, get_migrations_plan
 
 class MigrationsTree(Tree):
     """A widget to display migrations."""
+
+    BINDINGS = [
+        Binding("j", "cursor_down", "Down", show=False),
+        Binding("k", "cursor_up", "Up", show=False),
+        Binding(
+            "ctrl+home", "scroll_home", "Home", show=False
+        ),  # TODO: make this work with gg keys
+        Binding(
+            "ctrl+g", "scroll_home", "Home", show=False
+        ),  # TODO: make this work with gg keys
+        Binding("G", "scroll_end", "End", show=False),
+    ]
 
     class Status(Message):
         """A message to update the status of a migration."""
