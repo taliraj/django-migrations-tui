@@ -1,4 +1,5 @@
 from textual.app import App, ComposeResult
+from textual.binding import Binding
 from textual.containers import Vertical
 from textual.widgets import Footer, Header
 
@@ -20,6 +21,7 @@ class MigrationsApp(App):
         ("m", "migrate", "Migrate"),
         ("f", "fake_migration", "Fake"),
         ("r", "revert_migrations", "Revert"),
+        Binding("q", "quit", "Quit", show=False),
     ]
 
     def __init__(self, *args, format: Format, **kwargs):
