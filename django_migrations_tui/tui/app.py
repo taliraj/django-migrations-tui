@@ -1,17 +1,46 @@
+from functools import partial
+
 from textual.app import App, ComposeResult
 from textual.binding import Binding
+from textual.command import Hit, Hits, Provider
 from textual.containers import Vertical
 from textual.widgets import Footer, Header
 
 from .confirmation import ConfirmationScreen
 from .logs import Log
 from .tree import MigrationsTree
-from .utils import Format
+from .utils import Format, get_migrations_plan
+
+
+class SelectMigrationCommands(Provider):
+    """A command provider to search for migrations."""
+
+    async def startup(self) -> None:
+        """Called once when the command palette is opened, prior to searching."""
+        worker = self.app.run_worker(get_migrations_plan, thread=True)
+        self.migrations = await worker.wait()
+
+    async def search(self, query: str) -> Hits:
+        """Search for migrations."""
+        matcher = self.matcher(query)
+        app = self.app
+        assert isinstance(app, MigrationsApp)
+
+        for migration in self.migrations:
+            command = f"Select {str(migration)}"
+            score = matcher.match(command)
+            if score > 0:
+                yield Hit(
+                    score,
+                    matcher.highlight(command),
+                    partial(app.select_migration, migration),
+                )
 
 
 class MigrationsApp(App):
     """A Textual app to manage django migrations."""
 
+    COMMANDS = App.COMMANDS | {SelectMigrationCommands}
     CSS_PATH = "static/app.tcss"
     TITLE = "Django Migrations TUI"
 
@@ -85,3 +114,7 @@ class MigrationsApp(App):
 
         if command:
             self.push_screen(ConfirmationScreen(command), check_confirmation)
+
+    def select_migration(self, migration: str) -> None:
+        tree = self.query_one(MigrationsTree)
+        tree.select_migration(migration)
