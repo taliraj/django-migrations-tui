@@ -247,3 +247,35 @@ class MigrationsTree(Tree):
     def post_success_message(self, message: str) -> None:
         """Post a success message to the log."""
         self.post_message(self.Status(f"[bold cyan]{message}"))
+
+    def select_migration(self, migration: str) -> None:
+        """Select a migration."""
+        if self.format == Format.LIST:
+            self._select_migration_list(migration)
+        else:
+            self._select_migration_plan(migration)
+
+    def _select_migration_plan(self, migration: str) -> None:
+        children = self.root.children
+        selected_node = next(
+            child for child in children if migration == str(child.label)
+        )
+        self.select_node(selected_node)
+
+    def _select_migration_list(self, migration: str) -> None:
+        migration = migration[5:]  # discard the [X] from the label
+        app_name, migration_name = migration.split(".")
+        app_node = next(
+            child
+            for child in self.root.children
+            if app_name == str(child.label).split(" (")[0]
+        )
+        app_node.expand()
+        self.select_node(app_node)
+
+        migration_node = next(
+            child
+            for child in app_node.children
+            if migration_name == str(child.label).split("] ")[1]
+        )
+        self.select_node(migration_node)
