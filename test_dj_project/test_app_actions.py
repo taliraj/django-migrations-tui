@@ -146,3 +146,23 @@ async def test_revert_migration_action(app):
             pilot.app.children[0].command
             == "[bold cyan]python manage.py migrate admin zero"
         ), "Command should contain the app name followed by zero"
+
+
+@pytest.mark.django_db
+async def test_vim_keybindings(app):
+    async with app.run_test() as pilot:
+        widgets = pilot.app.children[0].children[0].children
+        tree = widgets[1]
+
+        assert tree.cursor_node.label.__str__() == "migrations (18/18)"
+        await pilot.press("j")
+        assert (
+            tree.cursor_node.label.__str__() == "admin (3/3)"
+        ), "Selction should go down"
+        await pilot.press("k")
+        assert (
+            tree.cursor_node.label.__str__() == "migrations (18/18)"
+        ), "Selection should go up"
+
+        await pilot.press("G")
+        assert tree.cursor_node.label.__str__() == "sessions (1/1)"
