@@ -1,4 +1,5 @@
 import pytest
+from textual.command import CommandPalette
 from textual.widgets import Button
 
 from django_migrations_tui.tui.app import Format, MigrationsApp
@@ -171,3 +172,11 @@ async def test_vim_keybindings(app):
 
         await pilot.press("ctrl+home")
         assert tree.cursor_node.label.__str__() == "migrations (18/18)"
+
+
+@pytest.mark.django_db
+async def test_search_select(app):
+    async with app.run_test() as pilot:
+        assert not CommandPalette.is_open(pilot.app), "Command palette should be open"
+        await pilot.press("ctrl+backslash")
+        assert CommandPalette.is_open(pilot.app), "Command palette should be open"
