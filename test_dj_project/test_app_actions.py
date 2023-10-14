@@ -59,3 +59,53 @@ async def test_migrate_action(app):
         assert (
             "Running python manage.py migrate" in logs
         ), "Logs should contain the command"
+
+
+@pytest.mark.django_db
+async def test_migrate_app_action(app):
+    async with app.run_test() as pilot:
+        await pilot.press("down")
+        await pilot.press("m")
+        assert isinstance(
+            pilot.app.children[0], ConfirmationScreen
+        ), "Confirmation screen should be displayed"
+        assert (
+            pilot.app.children[0].command == "[bold cyan]python manage.py migrate admin"
+        ), "Command should conatin the app name"
+
+        await pilot.click("#yes")  # "Click on the Migrate button"
+        widgets = pilot.app.children[0].children[0].children
+        log_widget = widgets[2]
+        assert log_widget.display is True, "Logs should be visible"
+
+        logs = [line.text.__str__() for line in log_widget.lines]
+        assert (
+            "Running python manage.py migrate admin" in logs
+        ), "Logs should contain the command"
+
+
+@pytest.mark.django_db
+async def test_migrate_migration_action(app):
+    async with app.run_test() as pilot:
+        await pilot.press("down")
+        await pilot.press("enter")
+        await pilot.press("down")
+        await pilot.press("m")
+
+        assert isinstance(
+            pilot.app.children[0], ConfirmationScreen
+        ), "Confirmation screen should be displayed"
+        assert (
+            pilot.app.children[0].command
+            == "[bold cyan]python manage.py migrate admin 0001_initial"
+        ), "Command should conatin the migration name"
+
+        await pilot.click("#yes")  # "Click on the Migrate button"
+        widgets = pilot.app.children[0].children[0].children
+        log_widget = widgets[2]
+        assert log_widget.display is True, "Logs should be visible"
+
+        logs = [line.text.__str__() for line in log_widget.lines]
+        assert (
+            "Running python manage.py migrate admin 0001_initial" in logs
+        ), "Logs should contain the command"
