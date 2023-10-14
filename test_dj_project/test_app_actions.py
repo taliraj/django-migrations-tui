@@ -165,4 +165,9 @@ async def test_vim_keybindings(app):
         ), "Selection should go up"
 
         await pilot.press("G")
-        assert tree.cursor_node.label.__str__() == "sessions (1/1)"
+        assert (
+            tree.cursor_node.label.__str__() == "sessions (1/1)"
+        ), "Selection should go the last app"
+
+        await pilot.press("ctrl+home")
+        assert tree.cursor_node.label.__str__() == "migrations (18/18)"
