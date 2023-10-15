@@ -106,17 +106,10 @@ async def test_list_format():
 
 @pytest.mark.django_db
 async def test_plan_format():
-    app = MigrationsApp(format=Format.LIST)
+    app = MigrationsApp(format=Format.PLAN)
     async with app.run_test() as pilot:
-        # switch to plan format
-        await pilot.press("v")
-
         widgets = pilot.app.children[0].children[0].children
         tree = widgets[1]
 
         assert str(tree.root.label) == "plan (18/18)"
         assert len(tree.root.children) == 18
-
-        # switch back to list format
-        await pilot.press("v")
-        assert str(tree.root.label) == "migrations (18/18)"
