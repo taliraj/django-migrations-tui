@@ -1,5 +1,6 @@
 from functools import partial
 
+from rich.syntax import Syntax
 from textual.app import App, ComposeResult
 from textual.binding import Binding
 from textual.command import Hit, Hits, Provider
@@ -50,12 +51,14 @@ class MigrationsApp(App):
         ("m", "migrate", "Migrate"),
         ("f", "fake_migration", "Fake"),
         ("r", "revert_migrations", "Revert"),
+        ("s", "sqlmigrate", "SQL"),
         Binding("q", "quit", "Quit", show=False),
     ]
 
     def __init__(self, *args, format: Format, **kwargs):
         self.format = format
         super().__init__(*args, **kwargs)
+        self.sql_code = ""
 
     def compose(self) -> ComposeResult:
         with Vertical():
@@ -67,7 +70,16 @@ class MigrationsApp(App):
     def on_migrations_tree_status(self, message: MigrationsTree.Status) -> None:
         """Called when the status of a migration changes."""
         rich_log = self.query_one(Log)
-        rich_log.write(message.message)
+        if message.sql:
+            if message.message == "BEGIN;":
+                self.sql_code = message.message # reset
+            elif message.message != "COMMIT;":
+                self.sql_code = f"{self.sql_code}\n{message.message}"
+            else:
+                self.sql_code = f"{self.sql_code}\n{message.message}"
+                rich_log.write(Syntax(self.sql_code, "sql", word_wrap=True, line_numbers=True))
+        else:
+            rich_log.write(message.message)
         rich_log.display = True
 
     def action_toggle_logs(self) -> None:
@@ -114,6 +126,17 @@ class MigrationsApp(App):
 
         if command:
             self.push_screen(ConfirmationScreen(command), check_confirmation)
+
+    def action_sqlmigrate(self) -> None:
+        tree = self.query_one(MigrationsTree)
+        command = tree.sqlmigrate()
+
+        def check_confirmation(apply) -> None:
+            if apply:
+                tree.run_command(command, sql=True)
+
+        if command:
+            self.push_screen(ConfirmationScreen(command, "Print SQL"), check_confirmation)
 
     def select_migration(self, migration: str) -> None:
         tree = self.query_one(MigrationsTree)
