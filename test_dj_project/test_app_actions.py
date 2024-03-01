@@ -7,7 +7,7 @@ from django_migrations_tui.tui.confirmation import ConfirmationScreen
 
 
 @pytest.fixture
-def app():
+def app(event_loop):
     return MigrationsApp(format=Format.LIST)
 
 
