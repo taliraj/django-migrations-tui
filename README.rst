@@ -29,6 +29,7 @@ Quick start
    * ``m``: Run ``migrate`` on the selected migration or app
    * ``f``: Run ``migrate --fake`` on the selected migration or app
    * ``r``: Run ``migrate <app name> zero`` on the selected app
+   * ``s``: Run ``sqlmigrate`` on the selected migration
    * ``q``: Quit the UI
    * ``ctrl+\``: Search and select migrations by name
    * Additionally, some vim keybindings are supported for navigation, including ``j``, ``k``, ``ctrl+home``, ``G``, ``ctrl+b`` and ``ctrl+f``.
