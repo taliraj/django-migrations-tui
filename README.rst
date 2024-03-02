@@ -6,7 +6,7 @@ Manage Django Migrations with a Text-Based UI
 
 Installation
 ------------
-``django-migrations-tui`` is available on PyPI and can be installed with ``pip``:
+To install, simply use ``pip``:
 
 .. code-block:: console
 
@@ -15,18 +15,24 @@ Installation
 Quick start
 -----------
 
-#. Add ``django_migrations_tui`` to your ``INSTALLED_APPS``.
-#. Run ``python manage.py migrationstui`` to start the UI.
-#. Use the arrow keys to navigate and press the letter keys to perform actions. The available actions are:
+#. Add ``django_migrations_tui`` to your Django project's ``INSTALLED_APPS``.
+#. Run the following command to start the interactive UI.
 
-   * ``v``: Change the format of the migration list: ``list`` or ``plan``
+    .. code-block:: console
+
+        python manage.py migrationstui
+
+#. Utilize the arrow keys for navigation and letter keys to perform actions:
+
+   * ``v``: Change the format of the migration view between ``list`` and ``plan``
    * ``l``: Toggle the logs panel
    * ``m``: Run ``migrate`` on the selected migration or app
    * ``f``: Run ``migrate --fake`` on the selected migration or app
    * ``r``: Run ``migrate <app name> zero`` on the selected app
+   * ``s``: Run ``sqlmigrate`` on the selected migration
    * ``q``: Quit the UI
    * ``ctrl+\``: Search and select migrations by name
-   * Some vim keybindings are also supported for navigation. Supported movements are ``j``, ``k``, ``ctrl+home``, ``G``, ``ctrl+b`` and ``ctrl+f``.
+   * Additionally, some vim keybindings are supported for navigation, including ``j``, ``k``, ``ctrl+home``, ``G``, ``ctrl+b`` and ``ctrl+f``.
 
 Screenshots
 -----------
