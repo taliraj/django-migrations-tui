@@ -146,7 +146,7 @@ class MigrationsTree(Tree):
         return command
 
     @work(exclusive=True)
-    async def run_command(self, command, sql: bool=False):
+    async def run_command(self, command, sql: bool = False):
         self.post_success_message(f"Running {' '.join(command)}")
 
         proc = await asyncio.create_subprocess_exec(
@@ -183,13 +183,18 @@ class MigrationsTree(Tree):
 
     def sqlmigrate(self):
         selected_item = self.cursor_node
-        if not selected_item.allow_expand and str(selected_item.label) == " (no migrations)":
+        if (
+            not selected_item.allow_expand
+            and str(selected_item.label) == " (no migrations)"
+        ):
             self.post_error_message("Select a migration to print the SQL.")
             return None
         elif not selected_item.allow_expand:
             app_name = str(selected_item.parent.label).split(" (")[0]
             migration_name = str(selected_item.label).split("] ")[1]
-            command = f"python manage.py sqlmigrate {app_name} {migration_name}".split(" ")
+            command = f"python manage.py sqlmigrate {app_name} {migration_name}".split(
+                " "
+            )
             return command
         else:
             self.post_warning_message("Select a migration name to print the SQL.")
@@ -249,7 +254,6 @@ class MigrationsTree(Tree):
                 self.post_warning_message("Select an app to revert.")
         else:
             self.post_error_message("Revert not supported in plan format.")
-
 
     def post_warning_message(self, message: str) -> None:
         """Post a warning message to the log."""

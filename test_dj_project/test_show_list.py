@@ -5,8 +5,8 @@ from django.apps import apps
 @pytest.mark.django_db
 def test_apps_list(migrations_list):
     models = apps.get_models()
-    apps_with_models = set(model._meta.app_label for model in models)
-    apps_with_migrations = set(migration.app_name for migration in migrations_list)
+    apps_with_models = {model._meta.app_label for model in models}
+    apps_with_migrations = {migration.app_name for migration in migrations_list}
     assert (
         apps_with_models
         == apps_with_migrations
@@ -23,8 +23,7 @@ def test_admin_migrations_list(migrations_list, recorded_migrations):
         migration for migration in recorded_migrations if migration[0] == "admin"
     ]
     assert admin_migrations_list.applied_count == len(admin_applied_migrations) == 3
-    admin_migrations = [migration for migration in admin_migrations_list.migrations]
-    assert admin_migrations == [
+    assert admin_migrations_list.migrations == [
         " [X] 0001_initial",
         " [X] 0002_logentry_remove_auto_add",
         " [X] 0003_logentry_add_action_flag_choices",
@@ -40,8 +39,7 @@ def test_auth_migrations_list(migrations_list, recorded_migrations):
         migration for migration in recorded_migrations if migration[0] == "auth"
     ]
     assert auth_migrations_list.applied_count == len(auth_applied_migrations) == 12
-    auth_migrations = [migration for migration in auth_migrations_list.migrations]
-    assert auth_migrations == [
+    assert auth_migrations_list.migrations == [
         " [X] 0001_initial",
         " [X] 0002_alter_permission_name_max_length",
         " [X] 0003_alter_user_email_max_length",
@@ -72,10 +70,7 @@ def test_contenttypes_migrations_list(migrations_list, recorded_migrations):
         == len(contenttypes_applied_migrations)
         == 2
     )
-    contenttypes_migrations = [
-        migration for migration in contenttypes_migrations_list.migrations
-    ]
-    assert contenttypes_migrations == [
+    assert contenttypes_migrations_list.migrations == [
         " [X] 0001_initial",
         " [X] 0002_remove_content_type_name",
     ]
@@ -92,7 +87,4 @@ def test_sessions_migrations_list(migrations_list, recorded_migrations):
     assert (
         sessions_migrations_list.applied_count == len(sessions_applied_migrations) == 1
     )
-    sessions_migrations = [
-        migration for migration in sessions_migrations_list.migrations
-    ]
-    assert sessions_migrations == [" [X] 0001_initial"]
+    assert sessions_migrations_list.migrations == [" [X] 0001_initial"]
