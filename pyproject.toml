@@ -1,3 +1,44 @@
+[project]
+name = "django-migrations-tui"
+dependencies = [
+    "Django",
+    "textual>=0.37.0"
+]
+requires-python = ">=3.8"
+description = "Manage Django Migrations with a Text-Based UI."
+readme = "README.rst"
+authors = [ {name = "Taulant Aliraj", email = "taliraj@outlook.com"} ]
+maintainers = [ {name = "Taulant Aliraj", email = "taliraj@outlook.com"} ]
+license = { file = "LICENSE"}
+classifiers = [
+    "Environment :: Web Environment",
+    "Framework :: Django",
+    "Intended Audience :: Developers",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12"
+]
+dynamic = ["version"]
+
+[project.optional-dependencies]
+test = [
+  "pytest",
+  "pytest-asyncio",
+  "pytest-django"
+]
+
+[project.urls]
+Homepage = "https://github.com/taliraj/django-migrations-tui"
+Repository = "https://github.com/taliraj/django-migrations-tui"
+
 [build-system]
-requires = ["setuptools"]
+requires = ["setuptools", "setuptools-scm"]
 build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+packages = ["django_migrations_tui"]
+
+[tool.setuptools_scm]
