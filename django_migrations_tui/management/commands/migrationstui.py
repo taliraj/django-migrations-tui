@@ -40,9 +40,9 @@ class Command(ShowMigrationsCommand):
         else:
             app_names = sorted(loader.migrated_apps)
 
-        migrations = list()
+        migrations = []
         for app_name in app_names:
-            app_migration = MigrationsList(app_name, 0, list())
+            app_migration = MigrationsList(app_name, 0, [])
             shown = set()
             for node in graph.leaf_nodes(app_name):
                 for plan_node in graph.forwards_plan(node):

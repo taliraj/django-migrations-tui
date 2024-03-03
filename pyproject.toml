@@ -42,3 +42,26 @@ build-backend = "setuptools.build_meta"
 packages = ["django_migrations_tui"]
 
 [tool.setuptools_scm]
+
+[tool.ruff.lint]
+select = [
+    "ASYNC",
+    "B",
+    "C4",
+    "C90",
+    "E",
+    "F",
+    "G",
+    "I",
+    "ISC",
+    "PERF",
+    "PLE",
+    "PLR0",
+    "W",
+    "RUF100",
+    "UP032",
+]
+[tool.ruff.lint.per-file-ignores]
+"test_dj_project/test_show_plan.py" = ["E501"]
+"test_dj_project/dj_project/settings.py" = ["E501"]
+"django_migrations_tui/management/commands/migrationstui.py" = ["C901", "PLR0912", "PERF401"]

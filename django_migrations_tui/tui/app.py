@@ -72,12 +72,14 @@ class MigrationsApp(App):
         rich_log = self.query_one(Log)
         if message.sql:
             if message.message == "BEGIN;":
-                self.sql_code = message.message # reset
+                self.sql_code = message.message  # reset
             elif message.message != "COMMIT;":
                 self.sql_code = f"{self.sql_code}\n{message.message}"
             else:
                 self.sql_code = f"{self.sql_code}\n{message.message}"
-                rich_log.write(Syntax(self.sql_code, "sql", word_wrap=True, line_numbers=True))
+                rich_log.write(
+                    Syntax(self.sql_code, "sql", word_wrap=True, line_numbers=True)
+                )
         else:
             rich_log.write(message.message)
         rich_log.display = True
@@ -136,7 +138,9 @@ class MigrationsApp(App):
                 tree.run_command(command, sql=True)
 
         if command:
-            self.push_screen(ConfirmationScreen(command, "Print SQL"), check_confirmation)
+            self.push_screen(
+                ConfirmationScreen(command, "Print SQL"), check_confirmation
+            )
 
     def select_migration(self, migration: str) -> None:
         tree = self.query_one(MigrationsTree)

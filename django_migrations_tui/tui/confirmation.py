@@ -1,4 +1,5 @@
 from typing import List
+
 from textual.app import ComposeResult
 from textual.containers import Grid
 from textual.screen import ModalScreen
@@ -8,7 +9,7 @@ from textual.widgets import Button, Label
 class ConfirmationScreen(ModalScreen[bool]):
     """Screen with a confirmation dialog"""
 
-    def __init__(self, command: List[str], label: str="Migrate"):
+    def __init__(self, command: List[str], label: str = "Migrate"):
         super().__init__()
         self.command = f"[bold cyan]{' '.join(command)}"
         self.label = label
